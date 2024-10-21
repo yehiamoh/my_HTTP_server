@@ -8,7 +8,7 @@ console.log("Logs from your program will appear here!");
    socket.on("close", () => {
      socket.end();
    });
-   socket.write(Buffer.from(`HTTP/1.1 200 OK \r\n\r\n`));
+   socket.write(Buffer.from(`HTTP/1.1 200 OK\r\n\r\n`));
    /**
     * socket.write() : send data through socket connection
     * 
