@@ -19,6 +19,28 @@ console.log("Logs from your program will appear here!");
     *   
     */
 
+   socket.on('data',(data)=>{
+    const request =data.toString();
+    const path= request.split(' ')[1];
+    const responseText = path === '/' ? 'HTTP/1.1 200 OK\r\n\r\n' : 'HTTP/1.1 404 Not Found\r\n\r\n';
+    const responseBuffer =Buffer.from(responseText);
+    socket.write(responseBuffer);
+    socket.end();
+
+/**
+ * 
+ * socket.on('data', ...) :This listens for the data event on the socket. The data event is triggered when the server receives data from the client. The data is typically a Buffer object.
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ */
+
+  });
+
  });
 
  server.listen(4221, "localhost");
