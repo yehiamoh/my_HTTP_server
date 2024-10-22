@@ -1,5 +1,6 @@
 import * as net from "net";
 import * as fs from "fs";
+import * as zlip from "zlib";
 
 const args = process.argv.slice(2);
 //The process.argv property returns an array containing the command-line arguments passed when the Node.js process was launched. The first element will be execPath. See process.argv0 if access to the original value of argv[0] is needed. The second element will be the path to the JavaScript file being executed. The remaining elements will be any additional command-line arguments.
@@ -38,14 +39,24 @@ const server = net.createServer((socket: net.Socket) => {
     let userAgentHeader: string | undefined = requestLines.find((line) => {
      return line.startsWith("User-Agent:");
     });
-    let acceptEncodingHeaderValue :string|undefined=requestLines.find((line)=>{
+    let acceptEncodingHeader:string|undefined=requestLines.find((line)=>{
       return line.startsWith("Accept-Encoding:")
     })
 
     if (url === "/") {
       responseText = "HTTP/1.1 200 OK\r\n\r\n";
     } else if (url === `/echo/${query}`) {
+      const clientCompressionSchemes = acceptEncodingHeader
+      ?.split(": ")[1]
+      .split(", ");
 
+      clientCompressionSchemes?.forEach((compressionSchema)=>{
+        if(compressionSchema==="gzip"){
+          const queryBuffer=Buffer.from(query,"utf-8");
+          const queryCompress=zlip.gzipSync(queryBuffer);
+          responseText = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Encoding: gzip\r\nContent-Length: ${queryCompress.length}\r\n\r\n`;
+        }
+      });
       responseText = `HTTP/1.1 200 OK\r\nContent-Type:text/palin\r\nContent-Length:${query.length}\r\n\r\n${query}`;
     } else if (url === "/user-agent" && userAgentHeader) {
       const userAgentHeaderValue = userAgentHeader.split(": ")[1];
