@@ -35,15 +35,20 @@ const server = net.createServer((socket: net.Socket) => {
 
     let responseText: string = "";
 
-    let userAgentHeaderValue: string | undefined = requestLines.find((line) => {
+    let userAgentHeader: string | undefined = requestLines.find((line) => {
      return line.startsWith("User-Agent:");
     });
+    let acceptEncodingHeaderValue :string|undefined=requestLines.find((line)=>{
+      return line.startsWith("Accept-Encoding:")
+    })
 
     if (url === "/") {
       responseText = "HTTP/1.1 200 OK\r\n\r\n";
     } else if (url === `/echo/${query}`) {
+
       responseText = `HTTP/1.1 200 OK\r\nContent-Type:text/palin\r\nContent-Length:${query.length}\r\n\r\n${query}`;
-    } else if (url === "/user-agent" && userAgentHeaderValue) {
+    } else if (url === "/user-agent" && userAgentHeader) {
+      const userAgentHeaderValue = userAgentHeader.split(": ")[1];
       responseText = `HTTP/1.1 200 OK\r\nContent-Type:text/palin\r\nContent-Length:${
         userAgentHeaderValue!.length
       }\r\n\r\n${userAgentHeaderValue}}`;
